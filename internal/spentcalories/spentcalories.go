@@ -27,9 +27,15 @@ func parseTraining(data string) (int, string, time.Duration, error) {
 	if err != nil {
 		return 0, "", 0, fmt.Errorf("невалидные данные о тренировке")
 	}
+	if steps <= 0 {
+		return 0, "", 0, fmt.Errorf("невалидные данные о тренировке")
+	}
 	activity := dataRaw[1]
 	timeSpent, err := time.ParseDuration(dataRaw[2])
 	if err != nil {
+		return 0, "", 0, fmt.Errorf("невалидные данные о тренировке")
+	}
+	if timeSpent <= 0 {
 		return 0, "", 0, fmt.Errorf("невалидные данные о тренировке")
 	}
 	return steps, activity, timeSpent, nil
@@ -95,7 +101,7 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 					"Длительность: %.2f ч.\n"+
 					"Дистанция: %.2f км.\n"+
 					"Скорость: %.2f км/ч\n"+
-					"Сожгли калорий: %.2f",
+					"Сожгли калорий: %.2f\n",
 				activity, timeSpent.Hours(), distance, speed, calories,
 			)
 			return result, nil
@@ -112,7 +118,7 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 					"Длительность: %.2f ч.\n"+
 					"Дистанция: %.2f км.\n"+
 					"Скорость: %.2f км/ч\n"+
-					"Сожгли калорий: %.2f",
+					"Сожгли калорий: %.2f\n",
 				activity, timeSpent.Hours(), distance, speed, calories,
 			)
 			return result, nil
