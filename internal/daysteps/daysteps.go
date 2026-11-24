@@ -1,7 +1,12 @@
 package daysteps
 
 import (
+	"fmt"
+	"strconv"
+	"strings"
 	"time"
+
+	"github.com/Yandex-Practicum/tracker/internal/spentcalories"
 )
 
 const (
@@ -12,9 +17,53 @@ const (
 )
 
 func parsePackage(data string) (int, time.Duration, error) {
-	// TODO: реализовать функцию
+
+	dataRaw := strings.Split(data, ",")
+	if len(dataRaw) != 2 {
+		return 0, 0, fmt.Errorf("невалидные данные о тренировке")
+	}
+	steps, err := strconv.Atoi(dataRaw[0])
+	if err != nil {
+		return 0, 0, fmt.Errorf("невалидные данные о тренировке")
+	}
+	if steps <= 0 {
+		return 0, 0, fmt.Errorf("невалидные данные о тренировке")
+	}
+	timeSpent, err := time.ParseDuration(dataRaw[1])
+	if err != nil {
+		return 0, 0, fmt.Errorf("невалидные данные о тренировке")
+	}
+	if timeSpent <= 0 {
+		return 0, 0, fmt.Errorf("невалидные данные о тренировке")
+	}
+	return steps, timeSpent, nil
 }
 
 func DayActionInfo(data string, weight, height float64) string {
-	// TODO: реализовать функцию
+
+	steps, duration, err := parsePackage(data)
+
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+
+	if steps <= 0 {
+		return ""
+	}
+
+	distance := float64(steps) * float64(stepLength) / float64(mInKm)
+
+	calories, err := spentcalories.WalkingSpentCalories(steps, weight, height, duration)
+	if err != nil {
+		return ""
+	}
+
+	result := fmt.Sprintf(
+		"Количество шагов: %d.\n"+
+			"Дистанция составила %.2f км.\n"+
+			"Вы сожгли %.2f ккал.\n",
+		steps, distance, calories,
+	)
+	return result
 }
